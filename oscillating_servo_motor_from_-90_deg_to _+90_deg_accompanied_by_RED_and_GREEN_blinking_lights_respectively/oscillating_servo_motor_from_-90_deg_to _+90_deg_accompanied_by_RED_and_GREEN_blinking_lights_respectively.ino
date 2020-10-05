@@ -1,8 +1,6 @@
 //src: https://www.tinkercad.com/things/arOOZJnayDd-arduino-blinking-led
-//src: http://www.cplusplus.com/reference/cmath/sin/
 
 #include <Servo.h>
-#include <math.h>
 
 const int redPin = 0;
 const int greenPin = 1;
@@ -24,11 +22,11 @@ void loop(){
   servo.write(servoAngle);
   
   if (servoAngle == 180) {
-    servoAngleIncrement -= 1;
+    servoAngleIncrement = -1;
   }
   
   else if (servoAngle == 0){
-    servoAngleIncrement += 1;
+    servoAngleIncrement = 1;
   }
   
   servoAngle += servoAngleIncrement;
@@ -43,5 +41,5 @@ void loop(){
     digitalWrite(0, LOW);
   }
   
-  delay(15);
+  delay(10);
 }
