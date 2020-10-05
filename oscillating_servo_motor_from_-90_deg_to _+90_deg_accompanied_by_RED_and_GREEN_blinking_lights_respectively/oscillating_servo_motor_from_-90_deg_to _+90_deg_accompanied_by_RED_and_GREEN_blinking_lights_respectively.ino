@@ -13,8 +13,8 @@ Servo servo;
 void setup() {
   servo.attach(servoPin);
   servo.write(servoAngle);
-  pinMode(0, OUTPUT);
-  pinMode(1, OUTPUT);
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
 }
 
 void loop(){
@@ -32,13 +32,13 @@ void loop(){
   servoAngle += servoAngleIncrement;
   
   if (servoAngle > 90) {
-    digitalWrite(0, HIGH);
-    digitalWrite(1, LOW);
+    digitalWrite(redPin, HIGH);
+    digitalWrite(greenPin, LOW);
   }
   
   else if (servoAngle < 90) {
-    digitalWrite(1, HIGH);
-    digitalWrite(0, LOW);
+    digitalWrite(greenPin, HIGH);
+    digitalWrite(redPin, LOW);
   }
   
   delay(10);
