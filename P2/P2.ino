@@ -35,10 +35,9 @@ class DCMotorControlledByLightLevel: public Process {
     }
   
   	void updateState() override {
-      int lightValue = analogRead(photoresistorPin);
-      analogWrite(dcMotorPin, map(lightValue, 26, 923, 0, 255));
-      Serial.println(lightValue);
-      scheduledDelay(50);
+      int lightValueToConstrainForLinearity = analogRead(photoresistorPin);
+      analogWrite(dcMotorPin, map(constrain(lightValueToConstrainForLinearity, 264, 923), 264, 923, 0, 255));
+      scheduledDelay(15);
     }
 };
  
