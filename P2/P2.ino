@@ -2,25 +2,26 @@
 
 class Process {
   public:
-    virtual void run() final {
-      unsigned long stamp = millis();
+    virtual void refresh() final {
+      unsigned long currentTimeStamp = millis();
       
-      if (stamp - latestStateUpdate >= nextStateUpdateDifferential) {
-        updateState();
-        latestStateUpdate = stamp;
+      if (currentTimeStamp - latestScheduledLoopIterationTimeStamp >= nextScheduledLoopIterationDifferential) {
+        nextScheduledLoopIterationDifferential = 0;
+        scheduledLoop();
+        latestScheduledLoopIterationTimeStamp = currentTimeStamp;
       }
     }
       
   protected:
-  	virtual void updateState() = 0;
+  	virtual void scheduledLoop() = 0;
   
   	virtual void scheduledDelay(int milliseconds) final {
-      nextStateUpdateDifferential = milliseconds;
+      nextScheduledLoopIterationDifferential = milliseconds;
     }
   
   private:
-  	unsigned int nextStateUpdateDifferential = 0;
-  	unsigned long latestStateUpdate = 0;
+  	unsigned int nextScheduledLoopIterationDifferential = 0;
+  	unsigned long latestScheduledLoopIterationTimeStamp = 0;
 };
 
 class DCMotorControlledByLightLevel: public Process {
@@ -34,7 +35,7 @@ class DCMotorControlledByLightLevel: public Process {
       pinMode(dcMotorPin, OUTPUT);
     }
   
-  	void updateState() override {
+  	void scheduledLoop() override {
       int lightValueToConstrainForLinearity = analogRead(photoresistorPin);
       analogWrite(dcMotorPin, map(constrain(lightValueToConstrainForLinearity, 264, 923), 264, 923, 0, 255));
       scheduledDelay(15);
@@ -48,5 +49,5 @@ void setup() {
 DCMotorControlledByLightLevel dcMotorControlledByLightLevel;
 
 void loop() {
-  dcMotorControlledByLightLevel.run();
+  dcMotorControlledByLightLevel.refresh();
 }
