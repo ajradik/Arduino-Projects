@@ -2,7 +2,6 @@
 
 class Process {
   public:
-  
     virtual void run() final {
       unsigned long stamp = millis();
       
@@ -13,10 +12,14 @@ class Process {
     }
       
   protected:
-  	unsigned int nextStateUpdateDifferential = 0;
   	virtual void updateState() = 0;
   
+  	virtual void scheduledDelay(int milliseconds) final {
+      nextStateUpdateDifferential = milliseconds;
+    }
+  
   private:
+  	unsigned int nextStateUpdateDifferential = 0;
   	unsigned long latestStateUpdate = 0;
 };
 
@@ -26,17 +29,22 @@ class DCMotorControlledByLightLevel: public Process {
   const int photoresistorPin = A0;
   
   public:
-  	
-  	DCMotorControlledByLightLevel() {
-      nextStateUpdateDifferential = 15;
+    DCMotorControlledByLightLevel() {
+      pinMode(photoresistorPin, INPUT);
+      pinMode(dcMotorPin, OUTPUT);
     }
-    
+  
   	void updateState() override {
-      
+      int lightValue = analogRead(photoresistorPin);
+      analogWrite(dcMotorPin, map(lightValue, 26, 923, 0, 255));
+      Serial.println(lightValue);
+      scheduledDelay(50);
     }
 };
  
-void setup() {}
+void setup() {
+  Serial.begin(9600);
+}
 
 DCMotorControlledByLightLevel dcMotorControlledByLightLevel;
 
