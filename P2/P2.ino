@@ -1,6 +1,6 @@
 //Copyright (c) 2020 Artemas J. Radik
 
-class Process {
+class ScheduledProcess {
   public:
     virtual void refresh() final {
       unsigned long currentTimeStamp = millis();
@@ -24,7 +24,7 @@ class Process {
   	unsigned long latestScheduledLoopIterationTimeStamp = 0;
 };
 
-class DCMotorControlledByLightLevel: public Process {
+class DCMotorControlledByLightLevel: public ScheduledProcess {
   
   const int dcMotorPin = 3;
   const int photoresistorPin = A0;
