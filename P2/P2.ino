@@ -161,9 +161,17 @@ class HobbyGearByTilt: public ScheduledProcess {
     }
   
   	void scheduledLoop() override {
-      digitalWrite(hobbyGearPinBottom, LOW);
-      digitalWrite(hobbyGearPinTop, HIGH);
-      Serial.println(digitalRead(tiltSensorPin));
+      
+      if (digitalRead(tiltSensorPin) == 0) {
+        digitalWrite(hobbyGearPinBottom, LOW);
+        digitalWrite(hobbyGearPinTop, HIGH);
+      }
+      
+      else if (digitalRead(tiltSensorPin) == 1) {
+        digitalWrite(hobbyGearPinBottom, HIGH);
+        digitalWrite(hobbyGearPinTop, LOW);
+      }
+      
       scheduledDelay(15);
     }
 };
