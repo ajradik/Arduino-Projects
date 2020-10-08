@@ -1,4 +1,5 @@
 //Copyright (c) 2020 Artemas J. Radik
+#include <Servo.h>
 
 class ScheduledProcess {
   public:
@@ -86,9 +87,8 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
     }
 };
 
-class SynchronousOppositeServosByDistance : public ScheduledProcess {
+class SynchronousOppositeServosByDistance: public ScheduledProcess {
   
-  #include <Servo.h>
   Servo topServo;
   Servo bottomServo;
   
@@ -97,11 +97,11 @@ class SynchronousOppositeServosByDistance : public ScheduledProcess {
       pinMode(distanceSensorPin, INPUT);
       pinMode(topServoPin, OUTPUT);
       pinMode(bottomServoPin, OUTPUT);
-      topServo.attach(topServoPin);
-      bottomServo.attach(bottomServoPin);
     }
   
   	void scheduledLoop() override {
+      topServo.attach(topServoPin);
+      bottomServo.attach(bottomServoPin);
       
       int distance = distanceInCm();
       int angle = map(constrain(distance, distanceMin, distanceMax), distanceMin, distanceMax, servoAngleMin, servoAngleMax);
@@ -143,7 +143,9 @@ class SynchronousOppositeServosByDistance : public ScheduledProcess {
 void setup() {}
 
 DCMotorControlledByLightLevel dcMotorControlledByLightLevel;
+SynchronousOppositeServosByDistance synchronousOppositeServosByDistance;
 
 void loop() {
   dcMotorControlledByLightLevel.refresh();
+  synchronousOppositeServosByDistance.refresh();
 }
