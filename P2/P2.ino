@@ -3,7 +3,8 @@
 
 class ScheduledProcess {
   public:
-    virtual void refresh() final {
+  
+  	virtual void refresh() final {
       unsigned long currentTimeStamp = millis();
       
       if (currentTimeStamp - latestScheduledLoopIterationTimeStamp >= nextScheduledLoopIterationDifferential) {
@@ -16,6 +17,8 @@ class ScheduledProcess {
   	virtual void scheduledDelay(int milliseconds) final {
       nextScheduledLoopIterationDifferential = milliseconds;
     }
+  
+  	virtual void scheduledSetup() = 0;
       
   protected:
   	virtual void scheduledLoop() = 0;
@@ -51,7 +54,7 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
   unsigned long ledState = 0;
   
   public:
-    FlashingLEDs() {
+    void scheduledSetup() override {
       for (int ledPin : ledPins) {
       	pinMode(ledPin, OUTPUT);
       }
@@ -65,11 +68,11 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
   };
   
   FlashingLEDs flashingLEDs;
-  const int minLEDscheduledDelay = 100;
+  const int minLEDscheduledDelay = 60;
   const int maxLEDscheduledDelay = 600;
   
   public:
-    DCMotorControlledByLightLevel() {
+    void scheduledSetup() override {
       pinMode(photoresistorPin, INPUT);
       pinMode(dcMotorPin, OUTPUT);
     }
@@ -93,15 +96,16 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
   Servo bottomServo;
   
   public:
-    SynchronousOppositeServosByDistance() {
+    void scheduledSetup() override {
       pinMode(distanceSensorPin, INPUT);
       pinMode(topServoPin, OUTPUT);
       pinMode(bottomServoPin, OUTPUT);
+      
+      topServo.attach(topServoPin);
+      bottomServo.attach(bottomServoPin);
     }
   
   	void scheduledLoop() override {
-      topServo.attach(topServoPin);
-      bottomServo.attach(bottomServoPin);
       
       int distance = distanceInCm();
       int angle = map(constrain(distance, distanceMin, distanceMax), distanceMin, distanceMax, servoAngleMin, servoAngleMax);
@@ -139,13 +143,17 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
       return duration / 29 / 2;
     }
 };
- 
-void setup() {}
 
-DCMotorControlledByLightLevel dcMotorControlledByLightLevel;
-SynchronousOppositeServosByDistance synchronousOppositeServosByDistance;
+ScheduledProcess* scheduledProccesses[] = {new DCMotorControlledByLightLevel(), new SynchronousOppositeServosByDistance()};
+
+void setup() {
+  for (ScheduledProcess* scheduledProcess : scheduledProccesses) {
+    scheduledProcess->scheduledSetup();
+  }
+}
 
 void loop() {
-  dcMotorControlledByLightLevel.refresh();
-  synchronousOppositeServosByDistance.refresh();
+  for (ScheduledProcess* scheduledProcess : scheduledProccesses) {
+    scheduledProcess->refresh();
+  }
 }
