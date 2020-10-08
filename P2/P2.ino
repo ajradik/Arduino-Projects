@@ -3,16 +3,15 @@
 
 class ScheduledProcess {
   public:
-  
-  virtual void refresh() final {
-    unsigned long currentTimeStamp = millis();
-  
-    if (currentTimeStamp - latestScheduledLoopIterationTimeStamp >= nextScheduledLoopIterationDifferential) {
-      nextScheduledLoopIterationDifferential = 0;
-      scheduledLoop();
-      latestScheduledLoopIterationTimeStamp = currentTimeStamp;
+    virtual void refresh() final {
+      unsigned long currentTimeStamp = millis();
+
+      if (currentTimeStamp - latestScheduledLoopIterationTimeStamp >= nextScheduledLoopIterationDifferential) {
+        nextScheduledLoopIterationDifferential = 0;
+        scheduledLoop();
+        latestScheduledLoopIterationTimeStamp = currentTimeStamp;
+      }
     }
-  }
   	
   	virtual void scheduledDelay(int milliseconds) final {
       nextScheduledLoopIterationDifferential = milliseconds;
