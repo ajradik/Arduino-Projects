@@ -53,9 +53,9 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
       int lightValueConstrainedForLinearity = constrain(lightValue, photoresistorMin, photoresistorMax);
       analogWrite(dcMotorPin, map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, dcMotorMin, dcMotorMax));
       
-      digitalWrite(ledPins[0] + (ledState % 4), LOW);
+      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), LOW);
       ledState++;
-      digitalWrite(ledPins[0] + (ledState % 4), HIGH);
+      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), HIGH);
       
       scheduledDelay(15);
     }
