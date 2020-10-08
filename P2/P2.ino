@@ -47,6 +47,8 @@ const int bottomServoPin = 4;
 const int servoAngleMin = 0;
 const int servoAngleMax = 180;
 
+const int tiltSensor = 0;
+
 class DCMotorControlledByLightLevel: public ScheduledProcess {
   
   class FlashingLEDs: public ScheduledProcess {
@@ -101,7 +103,6 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
       pinMode(distanceSensorPin, INPUT);
       pinMode(topServoPin, OUTPUT);
       pinMode(bottomServoPin, OUTPUT);
-      
       topServo.attach(topServoPin);
       bottomServo.attach(bottomServoPin);
     }
@@ -144,6 +145,8 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
       return duration / 29 / 2;
     }
 };
+
+
 
 ScheduledProcess* scheduledProccesses[] = {new DCMotorControlledByLightLevel(), new SynchronousOppositeServosByDistance()};
 
