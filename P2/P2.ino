@@ -160,7 +160,7 @@ class HobbyGearByTilt: public ScheduledProcess {
       analogWrite(enableHobbyGearPin, enableHobbyGearPinMax);
     }
 
-  	void scheduledLoop() override {
+    void scheduledLoop() override {
 
       if (digitalRead(tiltSensorPin) == 0) {
         digitalWrite(hobbyGearPinBottom, LOW);
