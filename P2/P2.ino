@@ -55,8 +55,8 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
   };
   
   FlashingLEDs flashingLEDs;
-  const int minLEDscheduledDelay = 160;
-  const int maxLEDscheduledDelay = 500;
+  const int minLEDscheduledDelay = 100;
+  const int maxLEDscheduledDelay = 600;
   
   public:
     DCMotorControlledByLightLevel() {
@@ -71,17 +71,13 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
       int lightValueConstrainedForLinearity = constrain(lightValue, photoresistorMin, photoresistorMax);
       analogWrite(dcMotorPin, map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, dcMotorMin, dcMotorMax));
       
-      flashingLEDs.scheduledDelay(map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, minLEDscheduledDelay, maxLEDscheduledDelay));
+      flashingLEDs.scheduledDelay(map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, maxLEDscheduledDelay, minLEDscheduledDelay));
       
       scheduledDelay(15);
     }
 };
-
-
  
-void setup() {
-  Serial.begin(9600);
-}
+void setup() {}
 
 DCMotorControlledByLightLevel dcMotorControlledByLightLevel;
 
