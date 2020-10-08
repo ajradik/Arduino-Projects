@@ -47,7 +47,11 @@ const int bottomServoPin = 4;
 const int servoAngleMin = 0;
 const int servoAngleMax = 180;
 
-const int tiltSensor = 0;
+const int tiltSensorPin = 0;
+const int hobbyGearPinBottom = 8;
+const int hobbyGearPinTop = 2;
+const int enableHobbyGearPin = 6;
+const int enableHobbyGearPinMax = 255;
 
 class DCMotorControlledByLightLevel: public ScheduledProcess {
   
@@ -146,14 +150,31 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
     }
 };
 
+class HobbyGearByTilt: public ScheduledProcess {
+  
+  public:
+    void scheduledSetup() override {
+      pinMode(tiltSensorPin, INPUT);
+      pinMode(hobbyGearPinBottom, OUTPUT);
+      pinMode(hobbyGearPinTop, OUTPUT);
+      analogWrite(enableHobbyGearPin, enableHobbyGearPinMax);
+    }
+  
+  	void scheduledLoop() override {
+      digitalWrite(hobbyGearPinBottom, LOW);
+      digitalWrite(hobbyGearPinTop, HIGH);
+      Serial.println(digitalRead(tiltSensorPin));
+      scheduledDelay(15);
+    }
+};
 
-
-ScheduledProcess* scheduledProccesses[] = {new DCMotorControlledByLightLevel(), new SynchronousOppositeServosByDistance()};
+ScheduledProcess* scheduledProccesses[] = {new DCMotorControlledByLightLevel(), new SynchronousOppositeServosByDistance(), new HobbyGearByTilt()};
 
 void setup() {
   for (ScheduledProcess* scheduledProcess : scheduledProccesses) {
     scheduledProcess->scheduledSetup();
   }
+  Serial.begin(9600);
 }
 
 void loop() {
