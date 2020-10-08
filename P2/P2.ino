@@ -4,7 +4,7 @@
 class ScheduledProcess {
   public:
   
-  	virtual void refresh() final {
+    virtual void refresh() final {
       unsigned long currentTimeStamp = millis();
       
       if (currentTimeStamp - latestScheduledLoopIterationTimeStamp >= nextScheduledLoopIterationDifferential) {
