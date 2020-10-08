@@ -24,20 +24,39 @@ class ScheduledProcess {
   	unsigned long latestScheduledLoopIterationTimeStamp = 0;
 };
 
+const int dcMotorPin = 3;
+const int dcMotorMin = 0;
+const int dcMotorMax = 255;
+
+const int photoresistorPin = A0;
+const int photoresistorMin = 264;
+const int photoresistorMax = 923;
+
+const int ledPins [4] = {10, 11, 12, 13};
+
 class DCMotorControlledByLightLevel: public ScheduledProcess {
   
-  const int dcMotorPin = 3;
-  const int photoresistorPin = A0;
+  unsigned long ledState = 0;
   
   public:
     DCMotorControlledByLightLevel() {
       pinMode(photoresistorPin, INPUT);
       pinMode(dcMotorPin, OUTPUT);
+      
+      for (int ledPin : ledPins) {
+      	pinMode(ledPin, OUTPUT);
+      }
     }
   
   	void scheduledLoop() override {
-      int lightValueToConstrainForLinearity = analogRead(photoresistorPin);
-      analogWrite(dcMotorPin, map(constrain(lightValueToConstrainForLinearity, 264, 923), 264, 923, 0, 255));
+      int lightValue = analogRead(photoresistorPin);
+      int lightValueConstrainedForLinearity = constrain(lightValue, photoresistorMin, photoresistorMax);
+      analogWrite(dcMotorPin, map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, dcMotorMin, dcMotorMax));
+      
+      digitalWrite(ledPins[0] + (ledState % 4), LOW);
+      ledState++;
+      digitalWrite(ledPins[0] + (ledState % 4), HIGH);
+      
       scheduledDelay(15);
     }
 };
