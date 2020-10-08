@@ -11,13 +11,13 @@ class ScheduledProcess {
         latestScheduledLoopIterationTimeStamp = currentTimeStamp;
       }
     }
-      
-  protected:
-  	virtual void scheduledLoop() = 0;
-  
+  	
   	virtual void scheduledDelay(int milliseconds) final {
       nextScheduledLoopIterationDifferential = milliseconds;
     }
+      
+  protected:
+  	virtual void scheduledLoop() = 0;
   
   private:
   	unsigned int nextScheduledLoopIterationDifferential = 0;
@@ -36,30 +36,48 @@ const int ledPins [4] = {10, 11, 12, 13};
 
 class DCMotorControlledByLightLevel: public ScheduledProcess {
   
+  class FlashingLEDs: public ScheduledProcess {
+  
   unsigned long ledState = 0;
   
   public:
-    DCMotorControlledByLightLevel() {
-      pinMode(photoresistorPin, INPUT);
-      pinMode(dcMotorPin, OUTPUT);
-      
+    FlashingLEDs() {
       for (int ledPin : ledPins) {
       	pinMode(ledPin, OUTPUT);
       }
     }
   
   	void scheduledLoop() override {
+      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), LOW);
+      ledState++;
+      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), HIGH);
+    }
+  };
+  
+  FlashingLEDs flashingLEDs;
+  const int minLEDscheduledDelay = 160;
+  const int maxLEDscheduledDelay = 500;
+  
+  public:
+    DCMotorControlledByLightLevel() {
+      pinMode(photoresistorPin, INPUT);
+      pinMode(dcMotorPin, OUTPUT);
+    }
+  
+  	void scheduledLoop() override {
+      flashingLEDs.refresh();
+      
       int lightValue = analogRead(photoresistorPin);
       int lightValueConstrainedForLinearity = constrain(lightValue, photoresistorMin, photoresistorMax);
       analogWrite(dcMotorPin, map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, dcMotorMin, dcMotorMax));
       
-      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), LOW);
-      ledState++;
-      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), HIGH);
+      flashingLEDs.scheduledDelay(map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, minLEDscheduledDelay, maxLEDscheduledDelay));
       
       scheduledDelay(15);
     }
 };
+
+
  
 void setup() {
   Serial.begin(9600);
