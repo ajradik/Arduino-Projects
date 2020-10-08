@@ -112,7 +112,6 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
     }
 
     void scheduledLoop() override {
-
       int distance = distanceInCm();
       int angle = map(constrain(distance, distanceMin, distanceMax), distanceMin, distanceMax, servoAngleMin, servoAngleMax);
 
