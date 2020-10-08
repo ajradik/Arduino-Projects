@@ -2,7 +2,7 @@
 #include <Servo.h>
 
 class ScheduledProcess {
-  
+
   public:
     virtual void refresh() final {
       unsigned long currentTimeStamp = millis();
@@ -13,19 +13,19 @@ class ScheduledProcess {
         latestScheduledLoopIterationTimeStamp = currentTimeStamp;
       }
     }
-  	
-  	virtual void scheduledDelay(int milliseconds) final {
+
+    virtual void scheduledDelay(int milliseconds) final {
       nextScheduledLoopIterationDifferential = milliseconds;
     }
-  
-  	virtual void scheduledSetup() = 0;
-      
+
+    virtual void scheduledSetup() = 0;
+
   protected:
-  	virtual void scheduledLoop() = 0;
-  
+    virtual void scheduledLoop() = 0;
+
   private:
-  	unsigned int nextScheduledLoopIterationDifferential = 0;
-  	unsigned long latestScheduledLoopIterationTimeStamp = 0;
+    unsigned int nextScheduledLoopIterationDifferential = 0;
+    unsigned long latestScheduledLoopIterationTimeStamp = 0;
 };
 
 const int dcMotorPin = 3;
@@ -54,54 +54,54 @@ const int enableHobbyGearPin = 6;
 const int enableHobbyGearPinMax = 255;
 
 class DCMotorControlledByLightLevel: public ScheduledProcess {
-  
+
   class FlashingLEDs: public ScheduledProcess {
-  
-  unsigned long ledState = 0;
-  
-  public:
-    void scheduledSetup() override {
-      for (int ledPin : ledPins) {
-      	pinMode(ledPin, OUTPUT);
+
+    unsigned long ledState = 0;
+
+    public:
+      void scheduledSetup() override {
+        for (int ledPin : ledPins) {
+          pinMode(ledPin, OUTPUT);
+        }
       }
-    }
-  
-  	void scheduledLoop() override {
-      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), LOW);
-      ledState++;
-      digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), HIGH);
-    }
+
+      void scheduledLoop() override {
+        digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), LOW);
+        ledState++;
+        digitalWrite(ledPins[0] + ( ledState % (sizeof(ledPins)/sizeof(ledPins[0])) ), HIGH);
+      }
   };
-  
+
   FlashingLEDs flashingLEDs;
   const int minLEDscheduledDelay = 60;
   const int maxLEDscheduledDelay = 600;
-  
+
   public:
     void scheduledSetup() override {
       flashingLEDs.scheduledSetup();
       pinMode(photoresistorPin, INPUT);
       pinMode(dcMotorPin, OUTPUT);
     }
-  
-  	void scheduledLoop() override {
+
+    void scheduledLoop() override {
       flashingLEDs.refresh();
-      
+
       int lightValue = analogRead(photoresistorPin);
       int lightValueConstrainedForLinearity = constrain(lightValue, photoresistorMin, photoresistorMax);
       analogWrite(dcMotorPin, map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, dcMotorMin, dcMotorMax));
-      
+
       flashingLEDs.scheduledDelay(map(lightValueConstrainedForLinearity, photoresistorMin, photoresistorMax, maxLEDscheduledDelay, minLEDscheduledDelay));
-      
+
       scheduledDelay(15);
     }
 };
 
 class SynchronousOppositeServosByDistance: public ScheduledProcess {
-  
+
   Servo topServo;
   Servo bottomServo;
-  
+
   public:
     void scheduledSetup() override {
       pinMode(distanceSensorPin, INPUT);
@@ -110,17 +110,17 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
       topServo.attach(topServoPin);
       bottomServo.attach(bottomServoPin);
     }
-  
-  	void scheduledLoop() override {
-      
+
+    void scheduledLoop() override {
+
       int distance = distanceInCm();
       int angle = map(constrain(distance, distanceMin, distanceMax), distanceMin, distanceMax, servoAngleMin, servoAngleMax);
-      
+
       topServo.write(angle);
       bottomServo.write(servoAngleMax - angle);
       scheduledDelay(15);
     }
-  	
+
     long distanceInCm() {
       //code citation https://www.tinkercad.com/things/9AzmS567fJN-ultrasonic-distance-sensor
 
@@ -151,7 +151,7 @@ class SynchronousOppositeServosByDistance: public ScheduledProcess {
 };
 
 class HobbyGearByTilt: public ScheduledProcess {
-  
+
   public:
     void scheduledSetup() override {
       pinMode(tiltSensorPin, INPUT);
@@ -159,19 +159,19 @@ class HobbyGearByTilt: public ScheduledProcess {
       pinMode(hobbyGearPinTop, OUTPUT);
       analogWrite(enableHobbyGearPin, enableHobbyGearPinMax);
     }
-  
+
   	void scheduledLoop() override {
-      
+
       if (digitalRead(tiltSensorPin) == 0) {
         digitalWrite(hobbyGearPinBottom, LOW);
         digitalWrite(hobbyGearPinTop, HIGH);
       }
-      
+
       else if (digitalRead(tiltSensorPin) == 1) {
         digitalWrite(hobbyGearPinBottom, HIGH);
         digitalWrite(hobbyGearPinTop, LOW);
       }
-      
+
       scheduledDelay(15);
     }
 };
