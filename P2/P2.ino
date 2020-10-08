@@ -2,6 +2,7 @@
 #include <Servo.h>
 
 class ScheduledProcess {
+  
   public:
     virtual void refresh() final {
       unsigned long currentTimeStamp = millis();
