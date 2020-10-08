@@ -73,6 +73,7 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
   
   public:
     void scheduledSetup() override {
+      flashingLEDs.scheduledSetup();
       pinMode(photoresistorPin, INPUT);
       pinMode(dcMotorPin, OUTPUT);
     }
