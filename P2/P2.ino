@@ -182,7 +182,6 @@ void setup() {
   for (ScheduledProcess* scheduledProcess : scheduledProccesses) {
     scheduledProcess->scheduledSetup();
   }
-  Serial.begin(9600);
 }
 
 void loop() {
