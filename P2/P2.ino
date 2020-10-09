@@ -33,7 +33,6 @@ class ScheduledProcess {
         scheduledLoop();
         latestScheduledLoopIterationTimeStamp = currentTimeStamp;
       }
-
     }
 
     virtual void scheduledDelay(int milliseconds) final {
@@ -48,7 +47,7 @@ class ScheduledProcess {
   private:
     unsigned int nextScheduledLoopIterationDifferential = 0;
     unsigned long latestScheduledLoopIterationTimeStamp = 0;
-    
+
 };
 
 const int dcMotorPin = 3;

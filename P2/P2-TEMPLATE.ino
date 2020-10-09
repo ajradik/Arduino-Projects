@@ -32,7 +32,6 @@ class ScheduledProcess {
         scheduledLoop();
         latestScheduledLoopIterationTimeStamp = currentTimeStamp;
       }
-
     }
 
     virtual void scheduledDelay(int milliseconds) final {
