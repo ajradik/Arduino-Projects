@@ -77,6 +77,7 @@ class DCMotorControlledByLightLevel: public ScheduledProcess {
     }
 
     void scheduledLoop() override {
+      flashingLEDs.refresh();
       //Type Your Code Here
       scheduledDelay(15);
     }
