@@ -47,6 +47,7 @@ class ScheduledProcess {
   private:
     unsigned int nextScheduledLoopIterationDifferential = 0;
     unsigned long latestScheduledLoopIterationTimeStamp = 0;
+
 };
 //DO NOT EDIT ABOVE THIS LINE
 
